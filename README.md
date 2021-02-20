@@ -4,7 +4,7 @@ Este pacote contém os scripts de controle e odometria do robô Wally.
 
 ## Informações sobre os scripts
 
-*listenner_ticks: Recebe os valores de pulsos dos encoders do robô e os publica de forma individual a cada encoder(A, B, C e D) e também a média dos encoders da esquerda e da direita.
+*listenner_ticks: Recebe os valores de pulsos dos encoders do robô e os publica de forma individual a cada encoder (A, B, C e D) e também a média dos encoders da esquerda e da direita.
 
 *due_fake: Recebe comandos do joystick e imita a publicação de dados dos encoders, com comandos do robô ir para frente, para tras, para esquerda e para a direita. Este script pode ser usado para controlar o Wally virtual através do joystick, sem a necessidade de acionamentos dos motores do Wally real.
 
@@ -45,7 +45,7 @@ $ source devel/setup.bash
 $ roslaunch wally_description wally.launch
 ```
 
-##### 4. Para controlar o Wally virtual via joystick
+##### 4. Para controlar o Wally virtual via joystick:
 
 ```sh
 $ rosrun joy joy_node
@@ -54,7 +54,7 @@ $ rosrun wally_control_odom listenner_ticks.py
 $ rosrun wally_control_odom odometry
 ```
 
-##### 5. Para controlar o Wally real via joystick(Neste caso o controle terá que estar ligado na Jetson do Wally)
+##### 5. Para controlar o Wally real via joystick (Neste caso o controle terá que estar ligado na Jetson do Wally):
 
 ```sh
 $ rosrun joy joy_node

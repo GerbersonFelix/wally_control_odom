@@ -18,12 +18,12 @@ Este pacote contém os scripts de controle e odometria do robô Wally.
 
 ## Instruções
 
+#### Atenção
+
 Se você vai usar um controle de xbox 360 e não possui o drive instalado ainda, siga este tutorial:
 [Configure o controle xbox ubuntu](https://www.edivaldobrito.com.br/configure-o-controle-xbox-ubuntu/)
 
 Para usar este pacote também é necessário ter o pacote [wally_description](https://github.com/GerbersonFelix/wally_description) instalado.
-
-#### Atenção
 
 O mapeamento de botôes do controle que está no código pode ser diferente do qual você irá usar. Os scripts que você terá que alterar o mapeamento caso for necessário, será o **due_fake** o os do arduino. O mapeamento dos botões pode ser verificado logo no inicio de cada script. Para saber se o que está no script corresponde ao seu controle, execute os seguintes comandos.
 

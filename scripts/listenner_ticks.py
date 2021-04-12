@@ -12,10 +12,8 @@ def ticks_callback(msg_ticks):
     global l_wheels
     global r_wheels
 
-
-
     ticks = msg_ticks.data
-    encoders = ticks.split('#')
+    encoders = ticks.split('#') #Divide a string usando o # como referencia, os dados vão para um vetor
     rospy.loginfo('Encoders: %s', encoders)
     encoder_A = int(encoders[0])
     encoder_B = int(encoders[1])

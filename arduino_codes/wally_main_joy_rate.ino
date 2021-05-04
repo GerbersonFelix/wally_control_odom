@@ -95,7 +95,7 @@ int vel = 30; //Velocidade do prototipo
 bool cmd_joy = false;
 char vel_on[80];
 unsigned long range_timer = 0;
-int t_pub = 50; //tempo de pub em milisegundos; Frequencia de 20Hz
+int t_pub = 1000; //tempo de pub em milisegundos; Frequencia de 20Hz
 int ativo;
 int cmd_vel_A, cmd_vel_B, cmd_vel_C, cmd_vel_D;
 int cmd_vel_RT, cmd_vel_LT, cmd_vel_ANALOG_LEFT;
@@ -394,24 +394,7 @@ void velCallBack_D(const std_msgs::Int16& msg_D) //Função de comandos recebido
 
 void joyCallBack(const sensor_msgs::Joy& joy) //Função de comando recebidos do joystick
 {
-  
-  if(joy.buttons[A] == 1)
-  {
-    stop_motor();
-  }
-  if(joy.buttons[B] == 1)
-  {
-    stop_motor();
-  }
-  if(joy.buttons[X] == 1)
-  {
-    stop_motor();
-  }
-  if(joy.buttons[Y] == 1)
-  {
-    stop_motor();
-  }
-  
+    
   if(joy.buttons[BACK] == 1)
   {
     cmd_joy = !cmd_joy;
@@ -426,92 +409,111 @@ void joyCallBack(const sensor_msgs::Joy& joy) //Função de comando recebidos do
   {
     stop_motor();
   }
-
   if(cmd_joy == true){
-    if(joy.axes[RT] != 1)
-    {
-      cmd_vel_RT = joy.axes[RT]*-100;
-      cmd_vel_RT = map(cmd_vel_RT, -100, 99, 0, 180);
-      go(cmd_vel_RT,cmd_vel_RT,cmd_vel_RT,cmd_vel_RT);
-    }
-    if(joy.axes[LT] != 1)
-    {
-      cmd_vel_LT = joy.axes[LT]*-100;
-      cmd_vel_LT = map(cmd_vel_LT, -100, 99, 0, 180);
-      back(cmd_vel_LT,cmd_vel_LT,cmd_vel_LT,cmd_vel_LT);
-    }
 
-    if(joy.axes[LEFT_ANALOG_RIGHT_LEFT] > 0)
+  if(joy.buttons[A] == 1)
+  {
+    stop_motor();
+  }
+  if(joy.buttons[B] == 1)
+  {
+    stop_motor();
+  }
+  if(joy.buttons[X] == 1)
+  {
+    stop_motor();
+  }
+  if(joy.buttons[Y] == 1)
+  {
+      counter_A = 0;
+      counter_B = 0;
+      counter_C = 0;
+      counter_D = 0;
+  }    
+  if(joy.axes[RT] != 1)
+  {
+    cmd_vel_RT = joy.axes[RT]*-100;
+    cmd_vel_RT = map(cmd_vel_RT, -100, 99, 0, 180);
+    go(cmd_vel_RT,cmd_vel_RT,cmd_vel_RT,cmd_vel_RT);
+  }
+  if(joy.axes[LT] != 1)
+  {
+    cmd_vel_LT = joy.axes[LT]*-100;
+    cmd_vel_LT = map(cmd_vel_LT, -100, 99, 0, 180);
+    back(cmd_vel_LT,cmd_vel_LT,cmd_vel_LT,cmd_vel_LT);
+  }
+
+  if(joy.axes[LEFT_ANALOG_RIGHT_LEFT] > 0)
+  {
+    cmd_vel_ANALOG_LEFT = joy.axes[LEFT_ANALOG_RIGHT_LEFT]*100;
+    cmd_vel_ANALOG_LEFT = map(cmd_vel_ANALOG_LEFT, 0, 99, 0, 180);
+    left(cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT);
+  }
+  if(joy.axes[LEFT_ANALOG_RIGHT_LEFT] < 0)
+  {
+    cmd_vel_ANALOG_LEFT = joy.axes[LEFT_ANALOG_RIGHT_LEFT]*-100;
+    cmd_vel_ANALOG_LEFT = map(cmd_vel_ANALOG_LEFT, 0, 99, 0, 180);
+    right(cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT);
+  }
+  
+  if(joy.axes[RIGHT_ANALOG_UP_DOWN] == 1)
+  {
+    go(vel,vel,vel,vel);    
+  }
+  if(joy.axes[RIGHT_ANALOG_UP_DOWN] == -1)
+  {
+    back(vel,vel,vel,vel);
+  }
+  if(joy.axes[RIGHT_ANALOG_RIGHT_LEFT] == 1)
+  {
+    left(vel,vel,vel,vel);
+  }
+  if(joy.axes[RIGHT_ANALOG_RIGHT_LEFT] == -1)
+  {
+    right(vel,vel,vel,vel);
+  }
+  
+  if(joy.axes[DPAD_UP_DOWN] == 1)
+  {    
+    if ((vel + 5)>=30 and (vel + 5)<255)
     {
-      cmd_vel_ANALOG_LEFT = joy.axes[LEFT_ANALOG_RIGHT_LEFT]*100;
-      cmd_vel_ANALOG_LEFT = map(cmd_vel_ANALOG_LEFT, 0, 99, 0, 180);
-      left(cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT);
+      vel = vel+5;
+      sprintf(vel_on,"%ld", vel);
+      nh.loginfo("pwm: ");
+      nh.loginfo(vel_on);
     }
-    if(joy.axes[LEFT_ANALOG_RIGHT_LEFT] < 0)
+  }
+  if(joy.axes[DPAD_UP_DOWN] == -1)
+  {
+    if ((vel - 5)>30 and (vel - 5)<=255)
     {
-      cmd_vel_ANALOG_LEFT = joy.axes[LEFT_ANALOG_RIGHT_LEFT]*-100;
-      cmd_vel_ANALOG_LEFT = map(cmd_vel_ANALOG_LEFT, 0, 99, 0, 180);
-      right(cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT,cmd_vel_ANALOG_LEFT);
+      vel = vel-5;
+      sprintf(vel_on,"%ld", vel);
+      nh.loginfo("pwm: ");
+      nh.loginfo(vel_on);
     }
-    
-    if(joy.axes[RIGHT_ANALOG_UP_DOWN] == 1)
+  }
+  if(joy.axes[DPAD_RIGHT_LEFT] == -1)
+  {
+    if ((vel + 5)>=30 and (vel + 5)<255)
     {
-      go(vel,vel,vel,vel);    
+      vel = vel+5;
+      sprintf(vel_on,"%ld", vel);
+      nh.loginfo("pwm: ");
+      nh.loginfo(vel_on);
     }
-    if(joy.axes[RIGHT_ANALOG_UP_DOWN] == -1)
+  }
+  if(joy.axes[DPAD_RIGHT_LEFT] == 1)
+  {
+    if ((vel - 5)>30 and (vel - 5)<=255)
     {
-      back(vel,vel,vel,vel);
+      vel = vel-5;
+      sprintf(vel_on,"%ld", vel);
+      nh.loginfo("pwm: ");
+      nh.loginfo(vel_on);
     }
-    if(joy.axes[RIGHT_ANALOG_RIGHT_LEFT] == 1)
-    {
-      left(vel,vel,vel,vel);
-    }
-    if(joy.axes[RIGHT_ANALOG_RIGHT_LEFT] == -1)
-    {
-      right(vel,vel,vel,vel);
-    }
-    
-    if(joy.axes[DPAD_UP_DOWN] == 1)
-    {    
-      if ((vel + 5)>=30 and (vel + 5)<255)
-      {
-        vel = vel+5;
-        sprintf(vel_on,"%ld", vel);
-        nh.loginfo("pwm: ");
-        nh.loginfo(vel_on);
-      }
-    }
-    if(joy.axes[DPAD_UP_DOWN] == -1)
-    {
-      if ((vel - 5)>30 and (vel - 5)<=255)
-      {
-        vel = vel-5;
-        sprintf(vel_on,"%ld", vel);
-        nh.loginfo("pwm: ");
-        nh.loginfo(vel_on);
-      }
-    }
-    if(joy.axes[DPAD_RIGHT_LEFT] == -1)
-    {
-      if ((vel + 5)>=30 and (vel + 5)<255)
-      {
-        vel = vel+5;
-        sprintf(vel_on,"%ld", vel);
-        nh.loginfo("pwm: ");
-        nh.loginfo(vel_on);
-      }
-    }
-    if(joy.axes[DPAD_RIGHT_LEFT] == 1)
-    {
-      if ((vel - 5)>30 and (vel - 5)<=255)
-      {
-        vel = vel-5;
-        sprintf(vel_on,"%ld", vel);
-        nh.loginfo("pwm: ");
-        nh.loginfo(vel_on);
-      }
-    }
-    }
+  }
+  }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -581,7 +583,7 @@ void loop(){
   
   unsigned long currentMillis = millis();
   
-  sprintf(motores,"%ld#%ld#%ld#%ld", counter_A, counter_B, counter_C, counter_D);
+  sprintf(motores,"%ld#%ld#%ld#%ld", counter_A, counter_B, counter_C, counter_D);//Junta todas os contadores de pulsos em uma string
   ticks_msg.data = motores;  
  
   if (currentMillis-range_timer >= t_pub) //publish every 50 milliseconds

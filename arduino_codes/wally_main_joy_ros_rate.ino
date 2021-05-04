@@ -101,7 +101,7 @@ int vel = 30; //Velocidade do prototipo
 bool cmd_joy = false;
 char vel_on[80];
 int ativo;
-int rate_ticks = 100; //Tempo em milisegundos da thread
+int rate_ticks = 50; //Tempo em milisegundos da thread
 int cmd_vel_A, cmd_vel_B, cmd_vel_C, cmd_vel_D; //Variaveis de pwm das duas ponte h
 int cmd_vel_RT, cmd_vel_LT, cmd_vel_ANALOG_LEFT;
 
@@ -406,23 +406,6 @@ void velCallBack_D(const std_msgs::Int16& msg_D) //Função de comandos recebido
 void joyCallBack(const sensor_msgs::Joy& joy) //Função de comando recebidos do joystick
 {
   
-  if(joy.buttons[A] == 1)
-  {
-    stop_motor();
-  }
-  if(joy.buttons[B] == 1)
-  {
-    stop_motor();
-  }
-  if(joy.buttons[X] == 1)
-  {
-    stop_motor();
-  }
-  if(joy.buttons[Y] == 1)
-  {
-    stop_motor();
-  }
-  
   if(joy.buttons[BACK] == 1)
   {
     cmd_joy = !cmd_joy;
@@ -439,6 +422,25 @@ void joyCallBack(const sensor_msgs::Joy& joy) //Função de comando recebidos do
   }
 
   if(cmd_joy == true){
+    if(joy.buttons[A] == 1)
+    {
+      stop_motor();
+    }
+    if(joy.buttons[B] == 1)
+    {
+      stop_motor();
+    }
+    if(joy.buttons[X] == 1)
+    {
+      stop_motor();
+    }
+    if(joy.buttons[Y] == 1)
+    {
+      counter_A = 0;
+      counter_B = 0;
+      counter_C = 0;
+      counter_D = 0;
+    }
     if(joy.axes[RT] != 1)
     {
       cmd_vel_RT = joy.axes[RT]*-100;
@@ -595,7 +597,7 @@ attachInterrupt(digitalPinToInterrupt(C8), ai7, RISING); //Canal 2
 
 void loop(){
 
-  sprintf(motores,"%ld#%ld#%ld#%ld", counter_A, counter_B, counter_C, counter_D);
+  sprintf(motores,"%ld#%ld#%ld#%ld", counter_A, counter_B, counter_C, counter_D);//Junta todas os contadores de pulsos em uma string
   ticks_msg.data = motores;
   
   pub.run();

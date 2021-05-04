@@ -241,18 +241,18 @@ void back_D(int duty_D)
 
 void go(int duty_A,int duty_B,int duty_C,int duty_D)
 {
-    //Motores A
+    //Motor A
     digitalWrite(IN1,HIGH);
     digitalWrite(IN2,LOW);
-    //Motores B
+    //Motor B
     digitalWrite(IN3,HIGH);
     digitalWrite(IN4,LOW);
     analogWrite(velocidadeA,duty_A);
     analogWrite(velocidadeB,duty_B);
-    //Motores C
+    //Motor C
     digitalWrite(IN5,LOW);
     digitalWrite(IN6,HIGH);
-    //Motores D
+    //Motor D
     digitalWrite(IN7,LOW);
     digitalWrite(IN8,HIGH);
     analogWrite(velocidadeC,duty_C);
@@ -261,18 +261,18 @@ void go(int duty_A,int duty_B,int duty_C,int duty_D)
 
 void back(int duty_A,int duty_B,int duty_C,int duty_D)
 {
-    //Motores A
+    //Motor A
     digitalWrite(IN1,LOW);
     digitalWrite(IN2,HIGH);
-    //Motores B
+    //Motor B
     digitalWrite(IN3,LOW);
     digitalWrite(IN4,HIGH);
     analogWrite(velocidadeA,duty_A);
     analogWrite(velocidadeB,duty_B);
-    //Motores C
+    //Motor C
     digitalWrite(IN5,HIGH);
     digitalWrite(IN6,LOW);
-    //Motores D
+    //Motor D
     digitalWrite(IN7,HIGH);
     digitalWrite(IN8,LOW);
     analogWrite(velocidadeC,duty_C);
@@ -281,18 +281,18 @@ void back(int duty_A,int duty_B,int duty_C,int duty_D)
 
 void left(int duty_A,int duty_B,int duty_C,int duty_D)
 {
-    //Motores A
+    //Motor A
     digitalWrite(IN1,HIGH);
     digitalWrite(IN2,LOW);
-    //Motores B
+    //Motor B
     digitalWrite(IN3,LOW);
     digitalWrite(IN4,HIGH);
     analogWrite(velocidadeA,duty_A);
     analogWrite(velocidadeB,duty_B);
-    //Motores C
+    //Motor C
     digitalWrite(IN5,HIGH);
     digitalWrite(IN6,LOW);
-    //Motores D
+    //Motor D
     digitalWrite(IN7,LOW);
     digitalWrite(IN8,HIGH);
     analogWrite(velocidadeC,duty_C);
@@ -301,18 +301,18 @@ void left(int duty_A,int duty_B,int duty_C,int duty_D)
 
 void right(int duty_A,int duty_B,int duty_C,int duty_D)
 {
-    //Motores A
+    //Motor A
     digitalWrite(IN1,LOW);
     digitalWrite(IN2,HIGH);
-    //Motores B
+    //Motor B
     digitalWrite(IN3,HIGH);
     digitalWrite(IN4,LOW);
     analogWrite(velocidadeA,duty_A);
     analogWrite(velocidadeB,duty_B);
-    //Motores C
+    //Motor C
     digitalWrite(IN5,LOW);
     digitalWrite(IN6,HIGH);
-    //Motores D
+    //Motor D
     digitalWrite(IN7,HIGH);
     digitalWrite(IN8,LOW);
     analogWrite(velocidadeC,duty_C);
@@ -321,18 +321,18 @@ void right(int duty_A,int duty_B,int duty_C,int duty_D)
 
 void stop_motor()
 {
-    //Motores A
+    //Motor A
     digitalWrite(IN1,LOW);
     digitalWrite(IN2,LOW);
-    //Motores B
+    //Motor B
     digitalWrite(IN3,LOW);
     digitalWrite(IN4,LOW);
     analogWrite(velocidadeA,0);
     analogWrite(velocidadeB,0);
-    //Motores C
+    //Motor C
     digitalWrite(IN5,LOW);
     digitalWrite(IN6,LOW);
-    //Motores D
+    //Motor D
     digitalWrite(IN7,LOW);
     digitalWrite(IN8,LOW);
     analogWrite(velocidadeC,0);

@@ -47,6 +47,7 @@ Então faça uma ação (aperte o botão ou desloque no caso do analógico) para
 
 ```sh
 $ sudo apt-get install ros-kinetic-serial
+$ sudo apt-get install ros-kinetic-rqt-multiplot 
 ```
 
 ##### 2. Faça o download deste pacote para a pasta src do seu catkin workspace:
@@ -79,3 +80,10 @@ $ rosrun wally_control_odom odometry
 $ rosrun joy joy_node
 $ rosrun rosserial_python serial_node.py /dev/ttyACM0 _baud:=115200
 ```
+
+##### Para visualização gráfica da velocidade de referência e da velocidade lida dos motores do Wally:
+
+```sh
+$ rosrun rqt_multiplot rqt_multiplot
+```
+E abra a configuração que está na pasta /rqt_multiplot

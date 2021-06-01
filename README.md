@@ -2,6 +2,10 @@
 
 Este pacote contém os scripts de controle e odometria do robô Wally.
 
+<p align="center">
+    <img src="./figs/Wally_real.jpg" width="600" height="360" title="Wally Robot">
+</p> 
+
 ## Informações sobre os scripts
 
 * **listenner_ticks:** Recebe a string que contém os valores de pulsos dos encoders do robô e os publica de forma individual a cada encoder (A, B, C e D) e também a média dos encoders da esquerda e da direita.
@@ -57,28 +61,31 @@ $ git clone https://github.com/GerbersonFelix/wally_control_odom.git
 $ cd ..
 $ catkin_make
 ```
-##### 3. Abrindo o ambiente de simulação:
+##### 3. Para controlar o Wally via teclado:
 
 ```sh
-$ cd ~/catkin_ws/
-$ source devel/setup.bash
-$ roslaunch wally_description wally.launch
-```
-
-##### 4. Para controlar o Wally virtual via joystick:
-
-```sh
-$ rosrun joy joy_node
-$ rosrun wally_control_odom due_fake
-$ rosrun wally_control_odom listenner_ticks.py 
-$ rosrun wally_control_odom odometry
-```
-
-##### 5. Para controlar o Wally real via joystick (Neste caso o controle terá que estar ligado na Jetson do Wally):
-
-```sh
-$ rosrun joy joy_node
+$ rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 $ rosrun rosserial_python serial_node.py /dev/ttyACM0 _baud:=115200
+$ rosrun wally_control_odom listenner_ticks.py
+$ rosrun wally_control_odom control_odom
+```
+
+##### 4. Para controlar o Wally via joystick:
+
+```sh
+$ rosrun joy joy_node
+$ rosrun teleop_twist_joy teleop_node
+$ rosrun rosserial_python serial_node.py /dev/ttyACM0 _baud:=115200
+$ rosrun wally_control_odom listenner_ticks.py
+$ rosrun wally_control_odom control_odom
+```
+
+##### 5. Para alterar os valores de kp, ki e kd enquanto está executando o controle:
+
+```sh
+$ rosrun wally_control_odom set_kp.py
+$ rosrun wally_control_odom set_ki.py
+$ rosrun wally_control_odom set_kd.py
 ```
 
 ##### Para visualização gráfica da velocidade de referência e da velocidade lida dos motores do Wally:

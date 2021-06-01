@@ -3,7 +3,7 @@
 Este pacote contém os scripts de controle e odometria do robô Wally.
 
 <p align="center">
-    <img src="./figs/Wally_real.jpg" width="800" height="600" title="Wally Robot">
+    <img src="./figs/Wally_real.jpg" width="480" height="360" title="Wally Robot">
 </p> 
 
 ## Informações sobre os scripts

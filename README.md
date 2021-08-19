@@ -39,7 +39,7 @@ Se você vai usar um controle de xbox 360 e não possui o drive instalado ainda,
 
 Para usar este pacote também é necessário ter o pacote [wally_description](https://github.com/GerbersonFelix/wally_description) instalado.
 
-O mapeamento de botôes do controle que está no código pode ser diferente do qual você irá usar. Os scripts que você terá que alterar o mapeamento caso for necessário, será o **due_fake** o do arduino. O mapeamento dos botões pode ser verificado logo no inicio de cada script. Para saber se o que está no script corresponde ao seu controle, execute os seguintes comandos.
+O mapeamento de botões do controle que está no código pode ser diferente do qual você irá usar. Os scripts que você terá que alterar o mapeamento caso for necessário, será o **due_fake** o do arduino. O mapeamento dos botões pode ser verificado logo no inicio de cada script. Para saber se o que está no script corresponde ao seu controle, execute os seguintes comandos.
 
 ```sh
 $ rosrun joy joy_node

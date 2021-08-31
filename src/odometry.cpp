@@ -16,11 +16,11 @@ int ticks_B = 0, prev_ticks_B = 0; // Pulsos atuais e anteriores do encoder B
 int ticks_C = 0, prev_ticks_C = 0; // Pulsos atuais e anteriores do encoder C
 int ticks_D = 0, prev_ticks_D = 0; // Pulsos atuais e anteriores do encoder D
 
-float d = 0; //Distancias percorridas pelo robô
-float d_A = 0; //Distancias percorridas pelo motor A
-float d_B = 0; //Distancias percorridas pelo motor B
-float d_C = 0; //Distancias percorridas pelo motor C
-float d_D = 0; //Distancias percorridas pelo motor D
+float d = 0; //Distancia percorrida pelo robô
+float d_A = 0; //Distancia percorrida pelo motor A
+float d_B = 0; //Distancia percorrida pelo motor B
+float d_C = 0; //Distancia percorrida pelo motor C
+float d_D = 0; //Distancia percorrida pelo motor D
 float d_left = 0; //Distancia percorrida pelos motores da esquerda
 float d_right = 0; //Distancia percorrida pelos motores da direita
 

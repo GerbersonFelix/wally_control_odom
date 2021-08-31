@@ -39,6 +39,7 @@ ros::Publisher ticks("ticks", &ticks_msg);
 
 /*Pinagem do arduino*/
 //////Ponte01///////
+//Frente do robo
 //motor_A
 const int IN1 = 12;
 const int IN2 = 11;
@@ -50,6 +51,7 @@ const int IN4 = 9;
 const int velocidadeB = 8;
 
 ///////Ponte02/////
+//Traseira do robo
 //motor_C
 const int IN5 = 3;
 const int IN6 = 4;
@@ -96,7 +98,6 @@ bool cmd_joy = false;
 char vel_on[80];
 unsigned long range_timer = 0;
 int t_pub = 1000; //tempo de pub em milisegundos; Frequencia de 20Hz
-int ativo;
 int cmd_vel_A, cmd_vel_B, cmd_vel_C, cmd_vel_D;
 int cmd_vel_RT, cmd_vel_LT, cmd_vel_ANALOG_LEFT;
 
@@ -345,7 +346,7 @@ void velCallBack_A(const std_msgs::Int16& msg_A) //Função de comandos recebido
   cmd_vel_A = msg_A.data;
   if(cmd_joy == false){
     if(cmd_vel_A>=0){
-    go_A(cmd_vel_A);
+      go_A(cmd_vel_A);
     }
     else{
       back_A(cmd_vel_A*-1);
@@ -358,7 +359,7 @@ void velCallBack_B(const std_msgs::Int16& msg_B) //Função de comandos recebido
   cmd_vel_B = msg_B.data;
   if(cmd_joy == false){
     if(cmd_vel_B>=0){
-    go_B(cmd_vel_B);
+      go_B(cmd_vel_B);
     }
     else{
       back_B(cmd_vel_B*-1);
@@ -371,7 +372,7 @@ void velCallBack_C(const std_msgs::Int16& msg_C) //Função de comandos recebido
   cmd_vel_C = msg_C.data;
   if(cmd_joy == false){
     if(cmd_vel_C>=0){
-    go_C(cmd_vel_C);
+      go_C(cmd_vel_C);
     }
     else{
       back_C(cmd_vel_C*-1);
@@ -384,7 +385,7 @@ void velCallBack_D(const std_msgs::Int16& msg_D) //Função de comandos recebido
   cmd_vel_D = msg_D.data;
   if(cmd_joy == false){
     if(cmd_vel_D>=0){
-    go_D(cmd_vel_D);
+      go_D(cmd_vel_D);
     }
     else{
       back_D(cmd_vel_D*-1);
@@ -423,7 +424,7 @@ void joyCallBack(const sensor_msgs::Joy& joy) //Função de comando recebidos do
   {
     stop_motor();
   }
-  if(joy.buttons[Y] == 1)
+  if(joy.buttons[Y] == 1) //Zera os contadores de interrupcoes
   {
       counter_A = 0;
       counter_B = 0;

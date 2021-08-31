@@ -45,6 +45,7 @@ ros::Publisher ticks("ticks", &ticks_msg);
 
 /*Pinagem do arduino*/
 //////Ponte01///////
+//Frente do robo
 //motor_A
 const int IN1 = 12;
 const int IN2 = 11;
@@ -56,6 +57,7 @@ const int IN4 = 9;
 const int velocidadeB = 8;
 
 ///////Ponte02/////
+//Traseira do robo
 //motor_C
 const int IN5 = 3;
 const int IN6 = 4;
@@ -100,9 +102,8 @@ char motor_d[10];
 int vel = 30; //Velocidade do prototipo
 bool cmd_joy = false;
 char vel_on[80];
-int ativo;
 int rate_ticks = 50; //Tempo em milisegundos da thread
-int cmd_vel_A, cmd_vel_B, cmd_vel_C, cmd_vel_D; //Variaveis de pwm das duas ponte h
+int cmd_vel_A, cmd_vel_B, cmd_vel_C, cmd_vel_D; //Variaveis de pwm do dois drives ponte h
 int cmd_vel_RT, cmd_vel_LT, cmd_vel_ANALOG_LEFT;
 
 //Botões do joystick
@@ -356,7 +357,7 @@ void velCallBack_A(const std_msgs::Int16& msg_A) //Função de comandos recebido
   cmd_vel_A = msg_A.data;
   if(cmd_joy == false){
     if(cmd_vel_A>=0){
-    go_A(cmd_vel_A);
+      go_A(cmd_vel_A);
     }
     else{
       back_A(cmd_vel_A*-1);
@@ -369,7 +370,7 @@ void velCallBack_B(const std_msgs::Int16& msg_B) //Função de comandos recebido
   cmd_vel_B = msg_B.data;
   if(cmd_joy == false){
     if(cmd_vel_B>=0){
-    go_B(cmd_vel_B);
+      go_B(cmd_vel_B);
     }
     else{
       back_B(cmd_vel_B*-1);
@@ -382,7 +383,7 @@ void velCallBack_C(const std_msgs::Int16& msg_C) //Função de comandos recebido
   cmd_vel_C = msg_C.data;
   if(cmd_joy == false){
     if(cmd_vel_C>=0){
-    go_C(cmd_vel_C);
+      go_C(cmd_vel_C);
     }
     else{
       back_C(cmd_vel_C*-1);
@@ -395,7 +396,7 @@ void velCallBack_D(const std_msgs::Int16& msg_D) //Função de comandos recebido
   cmd_vel_D = msg_D.data;
   if(cmd_joy == false){
     if(cmd_vel_D>=0){
-    go_D(cmd_vel_D);
+      go_D(cmd_vel_D);
     }
     else{
       back_D(cmd_vel_D*-1);
@@ -434,7 +435,7 @@ void joyCallBack(const sensor_msgs::Joy& joy) //Função de comando recebidos do
     {
       stop_motor();
     }
-    if(joy.buttons[Y] == 1)
+    if(joy.buttons[Y] == 1) //Zera os contadores das interrupcoes
     {
       counter_A = 0;
       counter_B = 0;
@@ -597,7 +598,7 @@ attachInterrupt(digitalPinToInterrupt(C8), ai7, RISING); //Canal 2
 
 void loop(){
 
-  sprintf(motores,"%ld#%ld#%ld#%ld", counter_A, counter_B, counter_C, counter_D);//Junta todas os contadores de pulsos em uma string
+  sprintf(motores,"%ld#%ld#%ld#%ld", counter_A, counter_B, counter_C, counter_D);//Junta todos os contadores de pulsos em uma string
   ticks_msg.data = motores;
   
   pub.run();

@@ -137,7 +137,7 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/wally_control_odom_node.cpp)
 
 add_executable(odometry src/odometry.cpp)
-add_executable(due_fake src/due_fake.cpp)
+add_executable(control_odom src/control_odom.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -155,7 +155,7 @@ add_executable(due_fake src/due_fake.cpp)
 # )
 
 target_link_libraries(odometry ${catkin_LIBRARIES})
-target_link_libraries(due_fake ${catkin_LIBRARIES})
+target_link_libraries(control_odom ${catkin_LIBRARIES})
 
 #############
 ## Install ##

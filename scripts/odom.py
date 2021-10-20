@@ -78,7 +78,7 @@ R = 0.0325 #Raio da roda em metros
 len_wheel = 0.027 #Largura da roda em metros
 res_enc = 341.2 #Pulsos por revolucao
 L = 0.2792 #Distancia entre as rodas em metros
-L_A = 0.22335 #Distancia entre os eixos das rodas frontais e traseiras em metros
+W = 0.22335 #Distancia entre os eixos das rodas frontais e traseiras em metros
 m_per_tick = (2*pi*R)/res_enc #Metros por pulso
 
 current_time = rospy.Time.now()

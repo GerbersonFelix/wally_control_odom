@@ -10,8 +10,8 @@
 #define len_wheel  0.027 //Largura da roda em metros
 #define res_enc  341.2 //341.2 pulsos por revolução
 #define L  0.2792 //Distancia entre as rodas em metros
-#define L_A  0.22335 //Distancia entre os eixos das rodas frontais e traseiras em metros
-#define m_per_tick  (2*3.14159*R)/res_enc //Metros por pulso
+#define W  0.22335 //Distancia entre os eixos das rodas frontais e traseiras em metros
+#define m_per_tick  (2*3.14159*R)/res_enc //Metros percorridos por pulso
 
 int duty_A = 0; //PWM do motor A
 int duty_B = 0; //PWM do motor B
@@ -21,8 +21,12 @@ int duty_D = 0; //PWM do motor D
 //Variaveis das velocidades de referencia
 float vel_linear_ref = 0; //Velocidade de referencia linear
 float vel_angular_ref = 0; //Velocidade de referencia angular
-float v_left_ref = 0; //Velocidade de referencia dos motores da esquerda
-float v_right_ref = 0; //Velocidade de referencia dos motores da direita
+float v_A_ref = 0; //Velocidade de referencia da roda A
+float v_B_ref = 0; //Velocidade de referencia da roda B
+float v_C_ref = 0; //Velocidade de referencia da roda C
+float v_D_ref = 0; //Velocidade de referencia da roda D
+float v_left_ref = 0; //Velocidade de referencia das rodas da esquerda (B e C)
+float v_right_ref = 0; //Velocidade de referencia das rodas da direita (A e D)
 
 int hz = 20; //frequencia
 double dt; //periodo
@@ -33,20 +37,20 @@ int ticks_C = 0, prev_ticks_C = 0; // Pulsos atuais e anteriores do encoder C
 int ticks_D = 0, prev_ticks_D = 0; // Pulsos atuais e anteriores do encoder D
 
 float d = 0; //Distancia percorrida pelo robô
-float d_A = 0; //Distancia percorrida pelo motor A
-float d_B = 0; //Distancia percorrida pelo motor B
-float d_C = 0; //Distancia percorrida pelo motor C
-float d_D = 0; //Distancia percorrida pelo motor D
-float d_left = 0; //Distancia percorrida pelos motores da esquerda
-float d_right = 0; //Distancia percorrida pelos motores da direita
+float d_A = 0; //Distancia percorrida pela roda A
+float d_B = 0; //Distancia percorrida pela roda B
+float d_C = 0; //Distancia percorrida pela roda C
+float d_D = 0; //Distancia percorrida pela roda D
+float d_left = 0; //Distancia percorrida pelas rodas da esquerda
+float d_right = 0; //Distancia percorrida pelas rodas da direita
 
 double v = 0.0; //Velocidade do robô
-float v_left = 0; //Velocidade dos motores da esquerda
-float v_right = 0; //Velocidade dos motores da direita
-float v_A = 0; //Velocidade do motor A
-float v_B = 0; //Velocidade do motor B
-float v_C = 0; //Velocidade do motor C
-float v_D = 0; //Velocidade do motor D
+float v_left = 0; //Velocidade do lado esquerdo do robô
+float v_right = 0; //Velocidade do lado direito do robô
+float v_A = 0; //Velocidade da roda A
+float v_B = 0; //Velocidade da roda B
+float v_C = 0; //Velocidade da roda C
+float v_D = 0; //Velocidade da roda D
 
 double x = 0.0; //Posição em x
 double y = 0.0; //Posição em y
@@ -54,17 +58,18 @@ double th = 0.0; //Angulo theta
 
 double vx = 0.0; //Velocidade em x
 double vy = 0.0; //Velocidade em y
-double vth = 0.0; //Velocidade do theta
+double vth = 0.0; //Velocidade angular
 
 //Variaveis do controle PID
-float kp = 120; //Parametro proporcional
-float ki = 30; //Parametro integral
-float kd = 60; //Parametro derivativo
+float kp = 130.0; //Parametro proporcional
+float ki = 42.5; //Parametro integral
+float kd = 0.0; //Parametro derivativo
 
-int pwmA_min = -255, pwmA_max = 255;
-int pwmB_min = -255, pwmB_max = 255;
-int pwmC_min = -255, pwmC_max = 255;
-int pwmD_min = -255, pwmD_max = 255;
+//Limites do PWM de cada motor
+int pwmA_min = -155, pwmA_max = 155;
+int pwmB_min = -155, pwmB_max = 155;
+int pwmC_min = -155, pwmC_max = 155;
+int pwmD_min = -155, pwmD_max = 155;
 
 //Variaveis de erro
 //Motores da direita
@@ -98,7 +103,7 @@ float e_ant_I_C = 0; //Erro integral anterior do motor C
 float e_ant_D_C = 0; //Erro derivativo anterior do motor C
 ///////////////////////////////////////////////////////////
 
-//Variaveis usadas pelos pubs
+//Variaveis usadas pelos publishers
 std_msgs::Int16 pwm_A_msg;
 std_msgs::Int16 pwm_B_msg;
 std_msgs::Int16 pwm_C_msg;
@@ -133,38 +138,20 @@ void tickCall_D(const std_msgs::Int64::ConstPtr& msg_D)
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////Funções de atualizações dos parametros////////////////////////
-
-int map(int x_f, int in_min, int in_max, int out_min, int out_max){
-    return int((x_f-in_min) * (out_max-out_min) / (in_max-in_min) + out_min);
-}
-
-int val_min(int atual, int antigo){
-  if (atual < antigo){
-    return atual;
-  }        
-  else{
-    return antigo;
-  }        
-}   
-
-int val_max(int atual, int antigo)
-{
-    if (atual > antigo){
-      return atual;
-    }        
-    else{
-        return antigo;
-    }
-}
+////////////////////////////Funções de atualizações de parametros////////////////////////
 void velCall(const geometry_msgs::Twist::ConstPtr& msg_vel)
 {
     vel_linear_ref = msg_vel->linear.x;
     vel_angular_ref = msg_vel->angular.z;
     //ROS_INFO("Ref linear: [%f] Ref angular: [%f]", vel_linear_ref, vel_angular_ref);
 
-    v_right_ref = vel_linear_ref + vel_angular_ref * L;
-    v_left_ref = vel_linear_ref - vel_angular_ref * L;
+    v_A_ref = vel_linear_ref + vel_angular_ref * L/2;
+    v_B_ref = vel_linear_ref - vel_angular_ref * L/2;
+    v_C_ref = vel_linear_ref - vel_angular_ref * L/2;
+    v_D_ref = vel_linear_ref + vel_angular_ref * L/2;
+
+    v_right_ref = (v_A_ref + v_D_ref)/2;
+    v_left_ref = (v_B_ref + v_C_ref)/2;
 
     vel_R_ref_msg.data = v_right_ref;
     vel_L_ref_msg.data = v_left_ref;
@@ -188,61 +175,60 @@ void kd_callback(const std_msgs::Float32::ConstPtr& msg_kd)
 
 void control()
 {
-    e_A = v_right_ref - v_A; //Calculo do erro do motor A
-    e_P_A = e_A;
-    e_I_A = e_ant_I_A + e_A;
-    e_D_A = e_ant_D_A;
 
-    e_B = v_left_ref - v_B; //Calculo do erro do motor B
-    e_P_B = e_B;
-    e_I_B = e_ant_I_B + e_B;
-    e_D_B = e_ant_D_B;
+e_A = v_A_ref - v_A; //Calculo do erro do motor A
+e_P_A = e_A;
+e_I_A = e_ant_I_A + e_A;
+e_D_A = e_ant_D_A - e_A;
 
-    e_C = v_left_ref - v_C; //Calculo do erro do motor C
-    e_P_C = e_C;
-    e_I_C = e_ant_I_C + e_C;
-    e_D_C = e_ant_D_C;
+e_B = v_B_ref - v_B; //Calculo do erro do motor B
+e_P_B = e_B;
+e_I_B = e_ant_I_B + e_B;
+e_D_B = e_ant_D_B - e_B;
 
-    e_D = v_right_ref - v_D; //Calculo do erro do motor D
-    e_P_D = e_D;
-    e_I_D = e_ant_I_D + e_D;
-    e_D_D = e_ant_D_D;
+e_C = v_C_ref - v_C; //Calculo do erro do motor C
+e_P_C = e_C;
+e_I_C = e_ant_I_C + e_C;
+e_D_C = e_ant_D_C - e_C;
 
-    duty_A = kp*e_P_A + ki*e_I_A + kd*e_D_A;
-    duty_B = kp*e_P_B + ki*e_I_B + kd*e_D_B;
-    duty_C = kp*e_P_C + ki*e_I_C + kd*e_D_C;
-    duty_D = kp*e_P_D + ki*e_I_D + kd*e_D_D;
+e_D = v_D_ref - v_D; //Calculo do erro do motor D
+e_P_D = e_D;
+e_I_D = e_ant_I_D + e_D;
+e_D_D = e_ant_D_D - e_D;
 
-    pwmA_min = val_min(duty_A,pwmA_min);
-    pwmA_max = val_max(duty_A,pwmA_max);
+duty_A = (kp*e_P_A) + (ki*e_I_A) + (kd*e_D_A);
+duty_B = (kp*e_P_B) + (ki*e_I_B) + (kd*e_D_B);
+duty_C = (kp*e_P_C) + (ki*e_I_C) + (kd*e_D_C);
+duty_D = (kp*e_P_D) + (ki*e_I_D) + (kd*e_D_D);
 
-    pwmB_min = val_min(duty_B,pwmB_min);
-    pwmB_max = val_max(duty_B,pwmB_max);
+if (duty_A > pwmA_max){duty_A = pwmA_max;}
+if (duty_A < pwmA_min){duty_A = pwmA_min;}
+if (duty_B > pwmB_max){duty_B = pwmB_max;}
+if (duty_B < pwmB_min){duty_B = pwmB_min;}
+if (duty_C > pwmC_max){duty_C = pwmC_max;}
+if (duty_C < pwmC_min){duty_C = pwmC_min;}
+if (duty_D > pwmD_max){duty_D = pwmD_max;}
+if (duty_D < pwmD_min){duty_D = pwmD_min;}
 
-    pwmC_min = val_min(duty_C,pwmC_min);
-    pwmC_max = val_max(duty_C,pwmC_max);
+pwm_A_msg.data = duty_A;
+pwm_B_msg.data = duty_B;
+pwm_C_msg.data = duty_C;
+pwm_D_msg.data = duty_D;
 
-    pwmD_min = val_min(duty_D,pwmD_min);
-    pwmD_max = val_max(duty_D,pwmD_max);
+ROS_INFO("PWM A: [%d] PWM B: [%d] PWM C: [%d] PWM D: [%d]", pwm_A_msg.data, pwm_B_msg.data, pwm_C_msg.data, pwm_D_msg.data);
+ROS_INFO("ERRO A: [%f] ERRO B: [%f] ERRO C: [%f] ERRO D: [%f]", e_A, e_B, e_C, e_D);
 
-    pwm_A_msg.data = map(duty_A,pwmA_min,pwmA_max,-255,255);
-    pwm_B_msg.data = map(duty_B,pwmB_min,pwmB_max,-255,255);
-    pwm_C_msg.data = map(duty_C,pwmC_min,pwmC_max,-255,255);
-    pwm_D_msg.data = map(duty_D,pwmD_min,pwmD_max,-255,255);
+e_ant_I_A = e_I_A;
+e_ant_D_A = e_D_A;
 
-    ROS_INFO("PWM A: [%d] PWM B: [%d] PWM C: [%d] PWM D: [%d]", pwm_A_msg.data, pwm_B_msg.data, pwm_C_msg.data, pwm_D_msg.data);
+e_ant_I_B = e_I_B; 
+e_ant_D_B = e_D_B;
 
-    e_ant_I_A = e_I_A;
-    e_ant_D_A = e_A;
+e_ant_I_C = e_I_C;
+e_ant_D_C = e_D_C;
 
-    e_ant_I_B = e_I_B; 
-    e_ant_D_B = e_B;
-
-    e_ant_I_C = e_I_C;
-    e_ant_D_C = e_C;
-
-    e_ant_I_D = e_I_D; 
-    e_ant_D_D = e_D;
+e_ant_I_D = e_I_D; 
+e_ant_D_D = e_D_D;
 
 }
 
@@ -254,7 +240,7 @@ int main(int argc, char** argv){
   ros::Time current_time;
   ros::Time last_time;
 
-/////////////////////////////Declaração do Pubs////////////////////////////////////////
+/////////////////////////////Declaração do Publishers////////////////////////////////////////
 
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
   ros::Publisher pwm_A_pub = n.advertise<std_msgs::Int16>("cmd_vel_A", 50, &pwm_A_msg);
@@ -268,7 +254,7 @@ int main(int argc, char** argv){
   ros::Publisher vel_R_ref_pub = n.advertise<std_msgs::Float32>("vel_R_ref", 50, &vel_R_ref_msg);
   ros::Publisher vel_L_ref_pub = n.advertise<std_msgs::Float32>("vel_L_ref", 50, &vel_L_ref_msg);
 
-////////////////////////////Declaração dos Subs/////////////////////////////////////////
+////////////////////////////Declaração dos Subscribers/////////////////////////////////////////
 
   ros::Subscriber tick_A = n.subscribe<std_msgs::Int64>("ticks_A", 1000, tickCall_A);
   ros::Subscriber tick_B = n.subscribe<std_msgs::Int64>("ticks_B", 1000, tickCall_B);
@@ -294,45 +280,45 @@ int main(int argc, char** argv){
 
     //ROS_INFO("dt[%f]", dt);
 
-    d_A = m_per_tick*(ticks_A - prev_ticks_A); //Distancia percorrida pelo motor A
-    d_B = m_per_tick*(ticks_B - prev_ticks_B); //Distancia percorrida pelo motor B
-    d_C = m_per_tick*(ticks_C - prev_ticks_C); //Distancia percorrida pelo motor C
-    d_D = m_per_tick*(ticks_D - prev_ticks_D); //Distancia percorrida pelo motor D
+    d_A = m_per_tick*(ticks_A - prev_ticks_A); //Distancia percorrida pela roda A
+    d_B = m_per_tick*(ticks_B - prev_ticks_B); //Distancia percorrida pela roda B
+    d_C = m_per_tick*(ticks_C - prev_ticks_C); //Distancia percorrida pela roda C
+    d_D = m_per_tick*(ticks_D - prev_ticks_D); //Distancia percorrida pela roda D
 
-    v_A = d_A/dt; //Velocidade do motor A em m/s
-    v_B = d_B/dt; //Velocidade do motor B em m/s
-    v_C = d_C/dt; //Velocidade do motor C em m/s
-    v_D = d_D/dt; //Velocidade do motor D em m/s
+    v_A = d_A/dt; //Velocidade da roda A em m/s
+    v_B = d_B/dt; //Velocidade da roda B em m/s
+    v_C = d_C/dt; //Velocidade da roda C em m/s
+    v_D = d_D/dt; //Velocidade da roda D em m/s
 
-    vel_A_msg.data = v_A; //Velocidade do motor A em m/s
-    vel_B_msg.data = v_B; //Velocidade do motor B em m/s
-    vel_C_msg.data = v_C; //Velocidade do motor C em m/s
-    vel_D_msg.data = v_D; //Velocidade do motor D em m/s
+    vel_A_msg.data = v_A; //Velocidade da roda A em m/s
+    vel_B_msg.data = v_B; //Velocidade da roda B em m/s
+    vel_C_msg.data = v_C; //Velocidade da roda C em m/s
+    vel_D_msg.data = v_D; //Velocidade da roda D em m/s
 
     prev_ticks_A = ticks_A; //Atualizaçao dos pulsos passados do encoder A
     prev_ticks_B = ticks_B; //Atualizaçao dos pulsos passados do encoder B
     prev_ticks_C = ticks_C; //Atualizaçao dos pulsos passados do encoder C
     prev_ticks_D = ticks_D; //Atualizaçao dos pulsos passados do encoder D
 
-    d_left = (d_B + d_C)/2; //Media da distancia percorrida dos motores da esquerda em metros
-    d_right = (d_A + d_D)/2; //Media da distancia percorrida dos motores da direita em metros
+    d_left = (d_B + d_C)/2; //Media da distancia percorrida das rodas da esquerda em metros
+    d_right = (d_A + d_D)/2; //Media da distancia percorrida das rodas da direita em metros
     d = (d_left + d_right)/2; //Media da distancia percorrida dos dois lados
-    ROS_INFO("d:[%f], d_left:[%f], d_right:[%f]", d, d_left, d_right);
+    //ROS_INFO("d:[%f], d_left:[%f], d_right:[%f]", d, d_left, d_right);
 
     v_left = d_left/dt; //Velocidade das rodas da direita
     v_right = d_right/dt; //Velocidade das rodas da esquerda
     v = d/dt; //Velocidade do robô
 
-    vx = v;
-    vy = 0;
-    vth = (v_right-v_left)/L;
+    vx = v; //Velocidade em x
+    vy = 0; //Velocidade em y
+    vth = (v_right-v_left)/L; //Velocidade angular
     ROS_INFO("Vx:[%f], Vy:[%f], Vth:[%f]", vx, vy, vth);
 
     //Calculo da odometria de uma maneira tipica, dadas as velocidades do robô
     double delta_x = ((vx * cos(th)) - (vy * sin(th)))* dt;
     double delta_y = ((vx * sin(th)) + (vy * cos(th)))* dt;
     double delta_th = vth * dt;
-    ROS_INFO("delta_x:[%f], delta_y:[%f], delta_th:[%f]", delta_x, delta_y, delta_th);
+    //ROS_INFO("delta_x:[%f], delta_y:[%f], delta_th:[%f]", delta_x, delta_y, delta_th);
 
     x += delta_x; //Atualização da posição em x
     y += delta_y; //Atualização da posição em y
@@ -377,18 +363,18 @@ int main(int argc, char** argv){
     control();
     
     //Publicação dos valores de PWM de cada motor
-    pwm_A_pub.publish( pwm_A_msg);
-    pwm_B_pub.publish( pwm_B_msg);
-    pwm_C_pub.publish( pwm_C_msg);
-    pwm_D_pub.publish( pwm_D_msg);
+    pwm_A_pub.publish(pwm_A_msg);
+    pwm_B_pub.publish(pwm_B_msg);
+    pwm_C_pub.publish(pwm_C_msg);
+    pwm_D_pub.publish(pwm_D_msg);
 
     //Publicação das velocidades
-    vel_R_ref_pub.publish( vel_R_ref_msg);
-    vel_L_ref_pub.publish( vel_L_ref_msg);
-    vel_A_pub.publish( vel_A_msg);
-    vel_B_pub.publish( vel_B_msg);
-    vel_C_pub.publish( vel_C_msg);
-    vel_D_pub.publish( vel_D_msg);
+    vel_R_ref_pub.publish(vel_R_ref_msg);
+    vel_L_ref_pub.publish(vel_L_ref_msg);
+    vel_A_pub.publish(vel_A_msg);
+    vel_B_pub.publish(vel_B_msg);
+    vel_C_pub.publish(vel_C_msg);
+    vel_D_pub.publish(vel_D_msg);
 
     ROS_INFO("Ref lado direito: [%f] Ref lado esquerdo: [%f]", v_right_ref, v_left_ref);
     ROS_INFO("Lido A: [%f] Lido B: [%f] Lido C: [%f] Lido D: [%f]", v_A, v_B, v_C, v_D);
@@ -400,14 +386,6 @@ int main(int argc, char** argv){
     //Publicação da odometria
     odom_pub.publish(odom); 
 
-    r.sleep();
-
-
-
-
-
-
-
-    
+    r.sleep();    
   }
 }

@@ -8,7 +8,7 @@ float R = 0.0325; //Raio da roda em metros
 float len_wheel = 0.027; //Largura da roda em metros
 float res_enc = 341.2; //341.2 pulsos por revolução
 float L = 0.2792; //Distancia entre as rodas em metros
-float L_A = 0.22335; //Distancia entre os eixos das rodas frontais e traseiras em metros
+float W = 0.22335; //Distancia entre os eixos das rodas frontais e traseiras em metros
 float m_per_tick = (2*3.14159*R)/res_enc; //Metros por pulso
 
 int ticks_A = 0, prev_ticks_A = 0; // Pulsos atuais e anteriores do encoder A
@@ -17,12 +17,12 @@ int ticks_C = 0, prev_ticks_C = 0; // Pulsos atuais e anteriores do encoder C
 int ticks_D = 0, prev_ticks_D = 0; // Pulsos atuais e anteriores do encoder D
 
 float d = 0; //Distancia percorrida pelo robô
-float d_A = 0; //Distancia percorrida pelo motor A
-float d_B = 0; //Distancia percorrida pelo motor B
-float d_C = 0; //Distancia percorrida pelo motor C
-float d_D = 0; //Distancia percorrida pelo motor D
-float d_left = 0; //Distancia percorrida pelos motores da esquerda
-float d_right = 0; //Distancia percorrida pelos motores da direita
+float d_A = 0; //Distancia percorrida pela roda A
+float d_B = 0; //Distancia percorrida pela roda B
+float d_C = 0; //Distancia percorrida pela roda C
+float d_D = 0; //Distancia percorrida pela roda D
+float d_left = 0; //Distancia percorrida pelas rodas da esquerda
+float d_right = 0; //Distancia percorrida pelas rodas da direita
 
 double x = 0.0; //Posição em x
 double y = 0.0; //Posição em y
@@ -31,13 +31,13 @@ double th = 0.0; //Angulo theta
 int hz = 20; //Frequencia
 double dt; //Periodo
 
-double vx = 0.1; //Velocidade em x
-double vy = -0.1; //Velocidade em y
-double vth = 0.1; //Velocidade angular
+double vx = 0.0; //Velocidade em x
+double vy = 0.0; //Velocidade em y
+double vth = 0.0; //Velocidade angular
 
 float v = 0; //Velocidade do robô
-float v_left = 0; //Velocidade dos motores da esquerda
-float v_right = 0; //Velocidade dos motores da direita
+float v_left = 0; //Velocidade do lado esquerdo do robô
+float v_right = 0; //Velocidade do lado direito do robô
 
 ///////////////////////////////Funções de atualizações dos pulsos////////////////////////
 void tickCall_A(const std_msgs::Int64::ConstPtr& msg_A)
@@ -88,10 +88,10 @@ int main(int argc, char** argv){
 
     dt = (current_time - last_time).toSec(); //Atualização do periodo
 
-    d_A = m_per_tick*(ticks_A - prev_ticks_A); //Distancia percorrida pelo motor A
-    d_B = m_per_tick*(ticks_B - prev_ticks_B); //Distancia percorrida pelo motor B
-    d_C = m_per_tick*(ticks_C - prev_ticks_C); //Distancia percorrida pelo motor C
-    d_D = m_per_tick*(ticks_D - prev_ticks_D); //Distancia percorrida pelo motor D    
+    d_A = m_per_tick*(ticks_A - prev_ticks_A); //Distancia percorrida pela roda A
+    d_B = m_per_tick*(ticks_B - prev_ticks_B); //Distancia percorrida pela roda B
+    d_C = m_per_tick*(ticks_C - prev_ticks_C); //Distancia percorrida pela roda C
+    d_D = m_per_tick*(ticks_D - prev_ticks_D); //Distancia percorrida pela roda D    
 
     prev_ticks_A = ticks_A; //Atualizaçao dos pulsos passados do encoder A
     prev_ticks_B = ticks_B; //Atualizaçao dos pulsos passados do encoder B

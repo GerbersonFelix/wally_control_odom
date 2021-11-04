@@ -96,7 +96,7 @@ char motor_d[10];
 //verde C2
 
 ///////////////////////////////Variaveis usadas////////////////////////////////
-int rate_ticks = 50; //Tempo em milisegundos da thread
+int rate_ticks = 50; //Tempo em milissegundos da thread. Frequencia de 20hz
 int cmd_vel_A, cmd_vel_B, cmd_vel_C, cmd_vel_D; //Variaveis de pwm das duas ponte h
 
 /////////////////////////////////Função da thread///////////////////////////////
